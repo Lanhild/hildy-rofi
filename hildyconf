@@ -1,0 +1,36 @@
+#!/bin/bash
+# A script used to modify configurations files on the fly, and to easily navigate them based on declared list
+# This script comes from DistroTube
+# The link to his repository is https://gitlab.com/dwt1/dmscripts
+
+# Determines what is the editor used for the configuration files
+#EDITOR="vim"
+#EDITOR="nvim"
+EDITOR="xed"
+
+# Declare a list of options - these are the config files path
+declare -a options=(
+"dunst - $HOME/.config/dunst/dunstrc"
+"flameshot - $HOME/.config/flameshot/flameshot.ini"
+"i3 - $HOME/.config/i3/config"
+"kitty - $HOME/.config/kitty/kitty.conf"
+"mpd - $HOME/.config/mpd/mpd.conf"
+"rofi - $HOME/.config/rofi/config.rasi"
+"picom - $HOME/.config/picom.conf"
+"quit"
+)
+
+# Print the list of available choices
+choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -l 20 -p 'Edit configuration:')
+
+# Quit, if the quit button has been selected
+if [[ "$choice" == "quit" ]]; then
+    echo "Program terminated." && exit 1
+
+# open the configuration file in $EDITOR, to modify it
+elif [ "$choice" ]; then
+    cfg=$(printf '%s\n' "${choice}" | awk '{printf $NF}')
+    $EDITOR "$cfg"
+else
+    echo "Program terminated" && exit 1
+fi
