@@ -1,0 +1,26 @@
+#!/bin/bash
+# A script used to modify the color of razer peripherals from rofi, without having to use a graphical backend such as Polychromatic
+# This script uses the openrazer daemon and razer-cli packages, thus they are dependencies.
+PATH="exec"
+
+# declare a list of options - these are the color effects
+declare -a options=(
+"pywal - razer-cli -a"
+"wave - razer-cli -e wave"
+"static - razer-cli -e static"
+)
+
+# Print the list of available options
+choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -l 20 -p 'Choose an effect:')
+
+# quit, if the quit option is selected
+if [[ "$choice" == "quit" ]]; then
+    echo "Program terminated." && exit 1
+    
+# Apply the effect 
+elif [ "$choice" ]; then
+    efct=$(printf '%s\n' "${choice}" | awk '{printf $NF}')
+    $PATH "$efct"
+else
+    echo "Program terminated" && exit 1
+fi

@@ -4,15 +4,17 @@
 # The link to his repository is https://gitlab.com/dwt1/dmscripts
 
 # Determines what is the editor used for the configuration files
-#EDITOR="vim"
+EDITOR="vim"
 #EDITOR="nvim"
-EDITOR="xed"
+#EDITOR="xed"
 
 # Declare a list of options - these are the config files path
 declare -a options=(
 "dunst - $HOME/.config/dunst/dunstrc"
 "flameshot - $HOME/.config/flameshot/flameshot.ini"
 "i3 - $HOME/.config/i3/config"
+"i3blocks - $HOME/.config/i3/i3blocks.conf"
+"i3 keybinds - $HOME/.config/i3/keybindings"
 "kitty - $HOME/.config/kitty/kitty.conf"
 "mpd - $HOME/.config/mpd/mpd.conf"
 "rofi - $HOME/.config/rofi/config.rasi"

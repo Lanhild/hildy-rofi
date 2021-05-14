@@ -12,11 +12,13 @@ if not current:
 	current = "Nothing is currently Playing"
 else:
 	current = "Currently Playing: "+current.rstrip()
-commands = b"List\nPlay/Pause\nNext\nPrev\nRandom\nVolume 25%\nVolume 35%\nVolume 50%\nVolume 75%\nVolume 100%"
+commands = b"List\nPlay/Pause\nPlayer\nNext\nPrev\nRandom\nVolume 25%\nVolume 35%\nVolume 50%\nVolume 75%\nVolume 100%"
 rofi = Popen(["rofi", "-selected-row", "1", "-mesg", current, "-i", "-dmenu", "-p", "MPC: "], stdout=PIPE, stdin=PIPE)
 tmp = rofi.communicate(input=commands)[0].decode().rstrip()
 if tmp == "Play/Pause":
 	check_call(["mpc", "toggle"])
+if tmp == "Player":
+    check_call(["kitty", "ncmpcpp"])
 if tmp == "Next":
 	check_call(["mpc", "next"])
 if tmp == "Prev":
@@ -37,6 +39,41 @@ if tmp == "List":
 	titles = check_output(["mpc", "playlist"])
 	track = 0
 	tlist = ""
+	for line in titles.splitlines():
+		track += 1
+		tlist = tlist + "[" + str(track) + "] " + line.decode() + "\n"
+	if track > 1:
+		tlist.rstrip()
+		tlist = "[SOURCES]\n" + tlist
+		rofi = Popen(["rofi", "-selected-row", "1", "-i", "-dmenu", "-p", "Play: "], stdout=PIPE, stdin=PIPE)
+		tmp = rofi.communicate(input=tlist.encode())[0].decode().rstrip()
+		tmp = tmp[tmp.find("[")+1:tmp.find("]")]
+	else:
+		tmp = "SOURCES"
+	if not tmp:
+		sys.exit(0)
+	if tmp == "SOURCES":
+		commands = "Local ~/Music\n"
+		playlists = check_output(["mpc", "lsplaylists"])
+		for line in playlists.splitlines():
+			commands = commands + line.decode() + "\n"
+		rofi = Popen(["rofi", "-mesg", current, "-i", "-dmenu", "-p", "Select Source: "], stdout=PIPE, stdin=PIPE)
+		tmp = rofi.communicate(input=commands.encode())[0].decode().rstrip()
+		if not tmp:
+			sys.exit(0)	
+		elif tmp == "Local ~/Music":
+			check_call(["mpc", "clear"])
+			check_call(["mpc", "update"])
+			files = check_output(["mpc", "listall"])
+			add = Popen(["mpc", "add"], stdin=PIPE)
+			add.communicate(files)
+			Popen(["mpc", "play"])
+		else:
+			check_call(["mpc", "clear"])
+			check_call(["mpc", "load", tmp])
+			check_call(["mpc", "play"])
+	else:
+		check_call(["mpc", "play", tmp])
 	for line in titles.splitlines():
 		track += 1
 		tlist = tlist + "[" + str(track) + "] " + line.decode() + "\n"
